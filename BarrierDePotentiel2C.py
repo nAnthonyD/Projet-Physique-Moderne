@@ -1,15 +1,15 @@
 from numpy import pi, exp, zeros, linspace, empty
 import matplotlib.pyplot as plt
 
-NX = 100  # Augmenté un peu pour une meilleure résolution de la barrière
-NT = 2000 # Augmenté pour laisser le temps à l'onde de frapper la barrière
+NX = 100  
+NT = 5000
 
 X_MIN = -10.0
-X_MAX = 10.0
+X_MAX = 15.0
 X_ARRAY = linspace(X_MIN, X_MAX, NX)
 
 DX = (X_MAX - X_MIN) / NX
-DT = 0.0005 # Stabilité numérique requise
+DT = 0.0005 
 
 def getWaveFunction(x, a, k0):
     return (2 / (pi * a**2))**(1/4) * exp(-(x**2) / a**2) * exp(1j * k0 * x)
@@ -78,8 +78,27 @@ def getTotalProbability(wave, j):
         totalProb += abs(wave[i, j])**2 * DX
     return totalProb
 
+def getTransmissionReflectionRates(wave, barrier_min_x, barrier_max_x):
+    last_j = NT - 1
+    
+    transmited = 0
+    reflected = 0
+    
+    for i in range(NX):
+        prob = abs(wave[i, last_j])**2 * DX
+        
+        if X_ARRAY[i] > barrier_max_x:
+            transmited += prob
+            
+        elif X_ARRAY[i] < barrier_min_x:
+            reflected += prob
+            
+    return transmited, reflected    
+
 def doAll(barrier, hbar, m):
     wave = doWave(hbar, m, barrier)
+    transmited, reflected = getTransmissionReflectionRates(wave, 2.0, 3.0)
+    print("transmission:", transmited, "réflexion:", reflected)
     plt.figure(figsize=(10, 5))
 
     plt.plot(X_ARRAY, barrier * 0.1, color='red', label="Barrière de potentiel V_0 (mise à l'échelle)")
