@@ -66,3 +66,17 @@ def HeightInfluenceTraversalTime(x_array, x0, k0, sigma, vg):
     plt.grid(True)
     plt.show()
 
+def showBarycenterEvolution(wave_system, x_end_barrier):
+    barycenters, times = wave_system.getBarycentersAndTimes(x_end_barrier)
+
+    if len(barycenters) == 0:
+        print("Erreur : Aucune donnée détectée après la barrière. Vérifiez si l'onde traverse !")
+    else:
+        print(f"Données trouvées : {len(barycenters)} points calculés.")
+    plt.figure(figsize=(8, 5))
+    plt.plot(times, barycenters, marker='o', color="blue")
+    plt.xlabel("Temps t")
+    plt.ylabel("Position du barycentre <x>")
+    plt.title("Évolution du barycentre de la densité de probabilité")
+    plt.grid(True)
+    plt.show()

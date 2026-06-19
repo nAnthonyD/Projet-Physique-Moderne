@@ -15,6 +15,7 @@ print("transmission =", wave_system.getTransmission(1.0))
 print("reflection =", wave_system.getReflection(0.0))
 print("traversal time =", wave_system.calculateTraversalTime(DT, 0.0, 1.0, -15, 2))
 wave_system.showQuantumWave()
+showBarycenterEvolution(wave_system, 1.0)
 
 
 

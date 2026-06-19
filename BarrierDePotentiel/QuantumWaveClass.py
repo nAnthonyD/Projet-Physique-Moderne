@@ -55,7 +55,6 @@ class QuantumWave:
             density = np.abs(psi_t[mask])**2
             norm = np.sum(density) * self.dx
             
-            # Sécurité pour ignorer le bruit numérique si la transmission est quasi-nulle
             if norm > 1e-12:
                 barycenter = np.sum(self.x[mask] * density) * self.dx / norm
                 barycenters.append(barycenter)
@@ -74,6 +73,26 @@ class QuantumWave:
         t_in = (x_start_barrier - x0) / v_g
         
         return t_out - t_in
+
+    def getBarycentersAndTimes(self, x_end_barrier):
+        nt = len(self.history)
+        start_idx = int(nt * 0.8)
+        
+        times = []
+        barycenters = []
+        
+        for n in range(start_idx, nt):
+            psi_t = self.history[n]
+            mask = self.x > x_end_barrier 
+            density = np.abs(psi_t[mask])**2
+            norm = np.sum(density) * self.dx
+            
+            if norm > 1e-10: # Seuil un peu plus large
+                barycenter = np.sum(self.x[mask] * density) * self.dx / norm
+                barycenters.append(barycenter)
+                times.append(n * DT)
+                
+        return barycenters, times
     
     def showQuantumWave(self):
         plt.figure(figsize=(10, 6))
