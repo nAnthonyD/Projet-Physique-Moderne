@@ -4,12 +4,11 @@ from scipy.sparse.linalg import splu
 import matplotlib.pyplot as plt
 
 
-# --- Constantes physiques ---
 HBAR = 1
 M = 1
 
 DT = 0.005
-NT = 3000  # Arrête la simulation à t = 7.5 secondes
+NT = 3000  
 
 class QuantumWave:
 

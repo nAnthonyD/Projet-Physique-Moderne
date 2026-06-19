@@ -1,7 +1,7 @@
 from QuantumWaveClass import *
 
 DT_Time = 0.005
-NT_Time = 10000  # Arrête la simulation à t = 50 secondes
+NT_Time = 10000 
 
 def HartmanEffectTraversalTime(x_array, x0, k0, sigma, vg):
 
