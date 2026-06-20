@@ -1,33 +1,33 @@
 from QuantumWaveClass import *
 
-DT_Time = 0.005
-NT_Time = 10000 
+DT_TIME = 0.005
+NT_TIME = 10000 
 
-def HartmanEffectTraversalTime(x_array, x0, k0, sigma, vg):
+def HartmanEffectTraversalTime(XArray, X0, K0, Sigma, Vg):
 
     V0 = 2.5
-    lengths = np.linspace(0.4, 2.6, 10)
+    Lengths = np.linspace(0.4, 2.6, 10)
     
-    tau_t_list = []
-    tau_0_list = [] 
+    TauTList = []
+    Tau0List = [] 
     
     print("\nCalcul de l'influence de la largeur sur le temps de traversée...")
-    for L in lengths:
-        V = createBarrier(x_array, V0, 0, L)
-        psi0 = createGaussianPacket(x_array, x0, k0, sigma)
+    for L in Lengths:
+        V = createBarrier(XArray, V0, 0, L)
+        Psi0 = createGaussianPacket(XArray, X0, K0, Sigma)
         
-        wave_system = QuantumWave(x_array, psi0, V)
-        wave_system.evolve(DT_Time, NT_Time)
+        WaveSystem = QuantumWave(XArray, Psi0, V)
+        WaveSystem.evolve(DT_TIME, NT_TIME)
         
-        tau_t = wave_system.calculateTraversalTime(DT_Time, 0, L, x0, k0)
+        TauT = WaveSystem.calculateTraversalTime(DT_TIME, 0, L, X0, K0)
         
-        if tau_t is not None:
-            tau_t_list.append(tau_t)
-            tau_0_list.append(L / vg)
+        if TauT is not None:
+            TauTList.append(TauT)
+            Tau0List.append(L / Vg)
 
     plt.figure(figsize=(8, 5))
-    plt.plot(lengths, tau_0_list, marker='o', color="green", label="Temps classique (L / v_g)")
-    plt.plot(lengths, tau_t_list, marker='s', color="blue", label="Temps quantique (Effet Hartman)")
+    plt.plot(Lengths, Tau0List, marker='o', color="green", label="Temps classique (L / v_g)")
+    plt.plot(Lengths, TauTList, marker='s', color="blue", label="Temps quantique (Effet Hartman)")
     plt.xlabel("Largeur de la barrière L")
     plt.ylabel("Temps de traversée")
     plt.title(f"Saturation du temps de traversée (Effet Hartman) - V0 = {V0}")
@@ -35,30 +35,30 @@ def HartmanEffectTraversalTime(x_array, x0, k0, sigma, vg):
     plt.grid(True)
     plt.show()
 
-def HeightInfluenceTraversalTime(x_array, x0, k0, sigma, vg):
+def HeightInfluenceTraversalTime(XArray, X0, K0, Sigma, Vg):
 
     L = 1.0
-    heights = np.linspace(2.0, 6.0, 10)
+    Heights = np.linspace(2.0, 6.0, 10)
     
-    tau_t_list = []
-    tau_0_constant = L / vg  
+    TauTList = []
+    Tau0Constant = L / Vg  
     
     print("\nCalcul de l'influence de la hauteur sur le temps de traversée...")
-    for V0 in heights:
-        V = createBarrier(x_array   , V0, 0, L)
-        psi0 = createGaussianPacket(x_array, x0, k0, sigma)
+    for V0 in Heights:
+        V = createBarrier(XArray   , V0, 0, L)
+        Psi0 = createGaussianPacket(XArray, X0, K0, Sigma)
         
-        wave_system = QuantumWave(x_array, psi0, V)
-        wave_system.evolve(DT_Time, NT_Time)
+        WaveSystem = QuantumWave(XArray, Psi0, V)
+        WaveSystem.evolve(DT_TIME, NT_TIME)
         
-        tau_t = wave_system.calculateTraversalTime(DT_Time, 0, L, x0, k0)
+        TauT = WaveSystem.calculateTraversalTime(DT_TIME, 0, L, X0, K0)
         
-        if tau_t is not None:
-            tau_t_list.append(tau_t)
+        if TauT is not None:
+            TauTList.append(TauT)
 
     plt.figure(figsize=(8, 5))
-    plt.plot(heights, tau_t_list, marker='s', color="blue", label="Temps quantique")
-    plt.axhline(tau_0_constant, color="green", linestyle="--", label="Temps classique constant")
+    plt.plot(Heights, TauTList, marker='s', color="blue", label="Temps quantique")
+    plt.axhline(Tau0Constant, color="green", linestyle="--", label="Temps classique constant")
     plt.xlabel("Hauteur de la barrière V0")
     plt.ylabel("Temps de traversée")
     plt.title(f"Influence de la hauteur sur le temps de traversée - L = {L}")
@@ -66,15 +66,15 @@ def HeightInfluenceTraversalTime(x_array, x0, k0, sigma, vg):
     plt.grid(True)
     plt.show()
 
-def showBarycenterEvolution(wave_system, x_end_barrier):
-    barycenters, times = wave_system.getBarycentersAndTimes(x_end_barrier)
+def showBarycenterEvolution(WaveSystem, XEndBarrier):
+    barycenters,times = WaveSystem.getBarycentersAndTimes(XEndBarrier)
 
     if len(barycenters) == 0:
         print("Erreur : Aucune donnée détectée après la barrière. Vérifiez si l'onde traverse !")
     else:
         print(f"Données trouvées : {len(barycenters)} points calculés.")
     plt.figure(figsize=(8, 5))
-    plt.plot(times, barycenters, marker='o', color="blue")
+    plt.plot(times, barycenters, marker='o', color="blue", linewidth=0.8, markersize=3)
     plt.xlabel("Temps t")
     plt.ylabel("Position du barycentre <x>")
     plt.title("Évolution du barycentre de la densité de probabilité")

@@ -12,95 +12,95 @@ NT = 3000
 
 class QuantumWave:
 
-    def __init__(self, x, psi0, V):
-        self.x = x
-        self.dx = x[1] - x[0]
-        self.psi = psi0.copy()
+    def __init__(self, X, Psi0, V):
+        self.X = X
+        self.Dx = X[1] - X[0]
+        self.Psi = Psi0.copy()
         self.V = V
-        self.nx = len(x)
+        self.Nx = len(X)
 
-    def evolve(self, dt, nt):
-        coeff = -(HBAR**2) / (2 * M * self.dx**2)
-        diag_princ = -2 * coeff * np.ones(self.nx) + self.V
-        diag_off = coeff * np.ones(self.nx - 1)
-        H = diags([diag_off, diag_princ, diag_off], [-1, 0, 1], format="csc")
+    def evolve(self, Dt, Nt):
+        Coeff = -(HBAR**2) / (2 * M * self.Dx**2)
+        DiagPrinc = -2 * Coeff * np.ones(self.Nx) + self.V
+        DiagOff = Coeff * np.ones(self.Nx - 1)
+        H = diags([DiagOff, DiagPrinc, DiagOff], [-1, 0, 1], format="csc")
 
-        I = identity(self.nx, format="csc")
-        facteur = 1j * dt / (2 * HBAR)
-        A = (I + facteur * H).tocsc()
-        B = (I - facteur * H).tocsc()
+        I = identity(self.Nx, format="csc")
+        Facteur = 1j * Dt / (2 * HBAR)
+        A = (I + Facteur * H).tocsc()
+        B = (I - Facteur * H).tocsc()
 
-        solver = splu(A)
+        Solver = splu(A)
         
-        psi_history = np.zeros((nt + 1, self.nx), dtype=complex)
-        psi_history[0] = self.psi
+        PsiHistory = np.zeros((Nt + 1, self.Nx), dtype=complex)
+        PsiHistory[0] = self.Psi
 
-        for n in range(nt):
-            self.psi = solver.solve(B.dot(self.psi))
-            psi_history[n + 1] = self.psi
+        for N in range(Nt):
+            self.Psi = Solver.solve(B.dot(self.Psi))
+            PsiHistory[N + 1] = self.Psi
             
-        self.history = psi_history
-        return psi_history
+        self.History = PsiHistory
+        return PsiHistory
 
-    def calculateTraversalTime(self, dt, x_start_barrier, x_end_barrier, x0, k0):
-        nt = len(self.history)
-        start_idx = int(nt * 0.8)
+    def calculateTraversalTime(self, Dt, XStartBarrier, XEndBarrier, X0, K0):
+        Nt = len(self.History)
+        StartIdx = int(Nt * 0.8)
         
-        times = []
-        barycenters = []
+        Times = []
+        Barycenters = []
         
-        for n in range(start_idx, nt):
-            psi_t = self.history[n]
-            mask = self.x > x_end_barrier
-            density = np.abs(psi_t[mask])**2
-            norm = np.sum(density) * self.dx
+        for N in range(StartIdx, Nt):
+            PsiT = self.History[N]
+            Mask = self.X > XEndBarrier
+            Density = np.abs(PsiT[Mask])**2
+            Norm = np.sum(Density) * self.Dx
             
-            if norm > 1e-12:
-                barycenter = np.sum(self.x[mask] * density) * self.dx / norm
-                barycenters.append(barycenter)
-                times.append(n * dt)
+            if Norm > 1e-12:
+                Barycenter = np.sum(self.X[Mask] * Density) * self.Dx / Norm
+                Barycenters.append(Barycenter)
+                Times.append(N * Dt)
                 
-        if len(times) < 2:
+        if len(Times) < 2:
             return None
             
-        coefs = np.polyfit(times, barycenters, 1)
-        v_out = coefs[0]
-        p0 = coefs[1]
+        Coefs = np.polyfit(Times, Barycenters, 1)
+        VOut = Coefs[0]
+        P0 = Coefs[1]
         
-        t_out = (x_end_barrier - p0) / v_out
+        TOut = (XEndBarrier - P0) / VOut
         
-        v_g = HBAR * k0 / M
-        t_in = (x_start_barrier - x0) / v_g
+        VG = HBAR * K0 / M
+        TIn = (XStartBarrier - X0) / VG
         
-        return t_out - t_in
+        return TOut - TIn
 
-    def getBarycentersAndTimes(self, x_end_barrier):
-        nt = len(self.history)
-        start_idx = int(nt * 0.8)
+    def getBarycentersAndTimes(self, XEndBarrier):
+        Nt = len(self.History)
+        StartIdx = int(Nt * 0.8)
         
-        times = []
-        barycenters = []
+        Times = []
+        Barycenters = []
         
-        for n in range(start_idx, nt):
-            psi_t = self.history[n]
-            mask = self.x > x_end_barrier 
-            density = np.abs(psi_t[mask])**2
-            norm = np.sum(density) * self.dx
+        for N in range(StartIdx, Nt):
+            PsiT = self.History[N]
+            Mask = self.X > XEndBarrier 
+            Density = np.abs(PsiT[Mask])**2
+            Norm = np.sum(Density) * self.Dx
             
-            if norm > 1e-10: # Seuil un peu plus large
-                barycenter = np.sum(self.x[mask] * density) * self.dx / norm
-                barycenters.append(barycenter)
-                times.append(n * DT)
+            if Norm > 1e-10: # Seuil un peu plus large
+                Barycenter = np.sum(self.X[Mask] * Density) * self.Dx / Norm
+                Barycenters.append(Barycenter)
+                Times.append(N * DT)
                 
-        return barycenters, times
+        return Barycenters, Times
     
     def showQuantumWave(self):
         plt.figure(figsize=(10, 6))
-        v_norm = self.V / np.max(self.V) * np.max(np.abs(self.history[0])**2)
+        VNorm = self.V / np.max(self.V) * np.max(np.abs(self.History[0])**2)
         
-        plt.plot(self.x, np.abs(self.history[0])**2, label='|ψ(x, t=0)|²', color='gray', linestyle=':')
-        plt.plot(self.x, np.abs(self.psi)**2, label='|ψ(x, t=final)|²', color='blue')
-        plt.plot(self.x, v_norm, label='Potentiel V(x)', color='red', linestyle='--')
+        plt.plot(self.X, np.abs(self.History[0])**2, label='|ψ(x, t=0)|²', color='gray', linestyle=':')
+        plt.plot(self.X, np.abs(self.Psi)**2, label='|ψ(x, t=final)|²', color='blue')
+        plt.plot(self.X, VNorm, label='Potentiel V(x)', color='red', linestyle='--')
         
         plt.title('Effet Tunnel : État Initial vs Final')
         plt.xlabel('Position x')
@@ -109,42 +109,42 @@ class QuantumWave:
         plt.grid(True)
         plt.show()
     
-    def getTransmission(self, x_end_barrier):
-        density = np.abs(self.psi)**2
-        self.transmission = np.sum(density[self.x > x_end_barrier]) * self.dx
-        return self.transmission
+    def getTransmission(self, XEndBarrier):
+        Density = np.abs(self.Psi)**2
+        self.Transmission = np.sum(Density[self.X > XEndBarrier]) * self.Dx
+        return self.Transmission
 
-    def getReflection(self, x_start_barrier):
-        density = np.abs(self.psi)**2
-        self.reflection = np.sum(density[self.x < x_start_barrier]) * self.dx
-        return self.reflection
+    def getReflection(self, XStartBarrier):
+        Density = np.abs(self.Psi)**2
+        self.Reflection = np.sum(Density[self.X < XStartBarrier]) * self.Dx
+        return self.Reflection
 
 
-def createGaussianPacket(x, x0, k0, sigma):
-    norm = (1 / (2 * np.pi * sigma**2)) ** 0.25
-    enveloppe = np.exp(-((x - x0) ** 2) / (4 * sigma**2))
-    return norm * enveloppe * np.exp(1j * k0 * x)
+def createGaussianPacket(X, X0, K0, Sigma):
+    Norm = (1 / (2 * np.pi * Sigma**2)) ** 0.25
+    Enveloppe = np.exp(-((X - X0) ** 2) / (4 * Sigma**2))
+    return Norm * Enveloppe * np.exp(1j * K0 * X)
 
-def createBarrier(x, V0, x_start, L):
-    V = np.zeros_like(x)
-    V[(x >= x_start) & (x <= x_start + L)] = V0
+def createBarrier(X, V0, XStart, L):
+    V = np.zeros_like(X)
+    V[(X >= XStart) & (X <= XStart + L)] = V0
     return V
 
-def calculateTransmission(psi, x, x_end_barrier):
-    density = np.abs(psi) ** 2
-    dx = x[1] - x[0]
-    return np.sum(density[x > x_end_barrier]) * dx
+def calculateTransmission(Psi, X, XEndBarrier):
+    Density = np.abs(Psi) ** 2
+    Dx = X[1] - X[0]
+    return np.sum(Density[X > XEndBarrier]) * Dx
 
 def getAnalyticalTransmission(E, V0, L):
     if E == V0:
         return 1 / (1 + (M * V0 * L**2) / (2 * HBAR**2))
     
     if E < V0: 
-        kappa = np.sqrt(2 * M * (V0 - E)) / HBAR
-        return 1 / (1 + (V0**2 * np.sinh(kappa * L)**2) / (4 * E * (V0 - E)))
+        Kappa = np.sqrt(2 * M * (V0 - E)) / HBAR
+        return 1 / (1 + (V0**2 * np.sinh(Kappa * L)**2) / (4 * E * (V0 - E)))
     else:  
-        k2 = np.sqrt(2 * M * (E - V0)) / HBAR
-        return 1 / (1 + (V0**2 * np.sin(k2 * L)**2) / (4 * E * (E - V0)))
+        K2 = np.sqrt(2 * M * (E - V0)) / HBAR
+        return 1 / (1 + (V0**2 * np.sin(K2 * L)**2) / (4 * E * (E - V0)))
     
 
     
