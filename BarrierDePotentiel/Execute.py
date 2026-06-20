@@ -15,9 +15,10 @@ print("transmission =", WaveSystem.getTransmission(1.0))
 print("reflection =", WaveSystem.getReflection(0.0))
 print("traversal time =", WaveSystem.calculateTraversalTime(DT, 0.0, 1.0, -15, 2))
 WaveSystem.showQuantumWave()
-showBarycenterEvolution(WaveSystem, 1.0)
 
+showBarycenterEvolution(WaveSystem,0, 1.0, -15.0, 2.0)
 
+showBarycenterZoom(WaveSystem, 0, 1.0, -15, 2.0)
 
 nx = 3000
 XArray = np.linspace(-120, 120, nx)
